@@ -16,7 +16,7 @@
                 </p>
             </header>
 
-            <form method="post" id="payment-form" action="/checkout.php">
+            <form method="post" id="payment-form" action="<?php echo $baseUrl;?>checkout.php">
                 <section>
                     <label for="amount">
                         <span class="input-label">Amount</span>
@@ -36,10 +36,10 @@
         </div>
     </div>
 
-    <script src="https://js.braintreegateway.com/web/dropin/1.2.0/js/dropin.min.js"></script>
+    <script src="https://js.braintreegateway.com/web/dropin/1.16.0/js/dropin.min.js"></script>
     <script>
         var form = document.querySelector('#payment-form');
-        var client_token = "<?php echo(Braintree\ClientToken::generate()); ?>";
+        var client_token = "<?php echo($gateway->ClientToken()->generate()); ?>";
 
         braintree.dropin.create({
           authorization: client_token,
@@ -48,12 +48,16 @@
             flow: 'vault'
           }
         }, function (createErr, instance) {
+          if (createErr) {
+            console.log('Create Error', createErr);
+            return;
+          }
           form.addEventListener('submit', function (event) {
             event.preventDefault();
 
             instance.requestPaymentMethod(function (err, payload) {
               if (err) {
-                console.log('Error', err);
+                console.log('Request Payment Method Error', err);
                 return;
               }
 
@@ -63,10 +67,7 @@
             });
           });
         });
-
-        var checkout = new Demo({
-          formID: 'payment-form'
-        });
     </script>
+    <script src="javascript/demo.js"></script>
 </body>
 </html>

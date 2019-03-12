@@ -4,7 +4,7 @@ require_once("../includes/braintree_init.php");
 $amount = $_POST["amount"];
 $nonce = $_POST["payment_method_nonce"];
 
-$result = Braintree\Transaction::sale([
+$result = $gateway->transaction()->sale([
     'amount' => $amount,
     'paymentMethodNonce' => $nonce,
     'options' => [
@@ -14,7 +14,7 @@ $result = Braintree\Transaction::sale([
 
 if ($result->success || !is_null($result->transaction)) {
     $transaction = $result->transaction;
-    header("Location: transaction.php?id=" . $transaction->id);
+    header("Location: " . $baseUrl . "transaction.php?id=" . $transaction->id);
 } else {
     $errorString = "";
 
@@ -23,5 +23,5 @@ if ($result->success || !is_null($result->transaction)) {
     }
 
     $_SESSION["errors"] = $errorString;
-    header("Location: index.php");
+    header("Location: " . $baseUrl . "index.php");
 }
